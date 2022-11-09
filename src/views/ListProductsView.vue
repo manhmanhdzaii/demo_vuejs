@@ -15,9 +15,19 @@
             <div class="c2_find_title">PRODUCTS CATEGORY</div>
             <div class="c2_find_content">
               <div
-                class="c2_find_b1_item"
+                class="
+                  c2_find_b1_item_hidden c2_find_b1_item
+                  hidden
+                  c2_find_b1_item_check
+                "
+                value="0"
+              ></div>
+              <div
+                class="c2_find_b1_item search"
                 v-for="(category, index) in categories"
                 :key="index"
+                @click="change_category($event)"
+                :value="category.id"
               >
                 {{ category.name }}
               </div>
@@ -36,6 +46,7 @@
                     max="1000"
                     value="100"
                     step="10"
+                    @change.passive="change_price($event)"
                   />
                   <input
                     type="range"
@@ -44,20 +55,37 @@
                     max="1000"
                     value="900"
                     step="10"
+                    @change.passive="change_price($event)"
                   />
                 </div>
               </div>
               <div class="find_price">
                 <div class="pricer_input">
                   <p>$</p>
-                  <input type="number" class="ip_min" value="100" />
+                  <input
+                    type="number"
+                    class="ip_min"
+                    value="100"
+                    @change.passive="change_range($event)"
+                  />
                 </div>
                 <div class="separator">-</div>
                 <div class="pricer_input">
                   <p>$</p>
-                  <input type="number" class="ip_max" value="900" />
+                  <input
+                    type="number"
+                    class="ip_max"
+                    value="900"
+                    @change.passive="change_range($event)"
+                  />
                 </div>
-                <div class="filter_price">Filter</div>
+                <div
+                  class="filter_price search"
+                  value="0"
+                  @click="change_filer($event)"
+                >
+                  Filter
+                </div>
               </div>
             </div>
           </div>
@@ -65,11 +93,38 @@
             <div class="c2_find_title">COLOUR</div>
             <div class="c2_find_content">
               <div class="b3_box_color">
-                <button class="b3_item_color item_color_white"></button>
-                <button class="b3_item_color item_color_black"></button>
-                <button class="b3_item_color item_color_red"></button>
-                <button class="b3_item_color item_color_yellow"></button>
-                <button class="b3_item_color item_color_blue"></button>
+                <button
+                  class="
+                    b3_item_color_hidden b3_item_color b3_item_color_check
+                    hidden
+                  "
+                  value="0"
+                ></button>
+                <button
+                  value="1"
+                  class="b3_item_color search item_color_white"
+                  @click="change_color($event)"
+                ></button>
+                <button
+                  value="2"
+                  class="b3_item_color search item_color_black"
+                  @click="change_color($event)"
+                ></button>
+                <button
+                  value="3"
+                  class="b3_item_color search item_color_red"
+                  @click="change_color($event)"
+                ></button>
+                <button
+                  value="4"
+                  class="b3_item_color search item_color_yellow"
+                  @click="change_color($event)"
+                ></button>
+                <button
+                  value="5"
+                  class="b3_item_color search item_color_blue"
+                  @click="change_color($event)"
+                ></button>
               </div>
             </div>
           </div>
@@ -77,28 +132,84 @@
             <div class="c2_find_title">SIZE</div>
             <div class="c2_find_content">
               <div class="b4_box_size">
-                <button class="b3_item_size">S</button>
-                <button class="b3_item_size">M</button>
-                <button class="b3_item_size">l</button>
-                <button class="b3_item_size b3_item_size_check">xl</button>
-                <button class="b3_item_size">xxl</button>
+                <button
+                  class="
+                    b3_item_size b3_item_size_hidden
+                    hidden
+                    b3_item_size_check
+                  "
+                  value="0"
+                ></button>
+                <button
+                  value="1"
+                  class="search b3_item_size"
+                  @click="change_size($event)"
+                >
+                  S
+                </button>
+                <button
+                  value="2"
+                  class="search b3_item_size"
+                  @click="change_size($event)"
+                >
+                  M
+                </button>
+                <button
+                  value="3"
+                  class="search b3_item_size"
+                  @click="change_size($event)"
+                >
+                  l
+                </button>
+                <button
+                  value="4"
+                  class="search b3_item_size search"
+                  @click="change_size($event)"
+                >
+                  xl
+                </button>
+                <button
+                  value="5"
+                  class="search b3_item_size"
+                  @click="change_size($event)"
+                >
+                  xxl
+                </button>
               </div>
             </div>
           </div>
         </div>
         <div class="c_b2_list">
           <div class="b2_list_sort">
-            <div class="list_sort_check" @click="price_search">
+            <div class="list_sort_check" @click="list_sort_check()">
               <p class="list_sort_check_tittle">Defaut Sorting</p>
               <img src="../assets/images/arrow_sort.png" />
-              <div class="list_sort_all" v-if="listSort">
-                <div class="list_sort_post">Defaut Sorting</div>
-                <div class="list_sort_post">Sort by price: low to high</div>
-                <div class="list_sort_post">Sort by price: high to low</div>
+              <div class="list_sort_all hidden">
+                <div
+                  class="list_sort_post list_sort_post_tick search"
+                  @click="list_sort_post($event)"
+                  value="0"
+                >
+                  Defaut Sorting
+                </div>
+                <div
+                  class="list_sort_post search"
+                  @click="list_sort_post($event)"
+                  value="1"
+                >
+                  Sort by price: low to high
+                </div>
+                <div
+                  class="list_sort_post search"
+                  @click="list_sort_post($event)"
+                  value="2"
+                >
+                  Sort by price: high to low
+                </div>
               </div>
             </div>
           </div>
-          <div class="b2_list_products">
+          <div class="b2_list_products" v-if="loadderrr">
             <div
               class="m_box2_item"
               v-for="(product, index) in products"
@@ -119,6 +230,9 @@
               <div class="m_b2_it_price">{{ product.price }} $</div>
             </div>
           </div>
+          <div class="div" v-else>
+            <img src="../assets/images/Loading_icon.gif" alt="" />
+          </div>
         </div>
       </div>
     </div>
@@ -130,11 +244,11 @@ export default {
   name: "listProduct",
   data() {
     return {
-      listSort: false,
       categories: [],
       products: [],
       cart: this.$store.state.cart.length,
       token: this.$store.state.token,
+      loadderrr: true,
     };
   },
   created() {
@@ -153,6 +267,155 @@ export default {
     getAllProducts() {
       this.$request.get("http://127.0.0.1:8000/api/products").then((res) => {
         this.products = res.data.data.data;
+      });
+    },
+    change_price(e) {
+      let priceInput = document.querySelectorAll(".pricer_input input");
+      let rangeInput = document.querySelectorAll(".range_input input");
+      let progress = document.querySelector(".slider .progress");
+      let pricegap = 100;
+      let minval = parseInt(rangeInput[0].value);
+      let maxval = parseInt(rangeInput[1].value);
+      if (maxval - minval < pricegap) {
+        if (e.target.className === "range_min") {
+          e.target.value = maxval - pricegap;
+          minval = maxval - pricegap;
+          priceInput[0].value = minval;
+        } else {
+          e.target.value = minval + pricegap;
+          maxval = minval + pricegap;
+          priceInput[1].value = maxval;
+        }
+      } else {
+        priceInput[0].value = minval;
+        priceInput[1].value = maxval;
+      }
+      progress.style.left = (minval / rangeInput[0].max) * 100 + "%";
+      progress.style.right = 100 - (maxval / rangeInput[1].max) * 100 + "%";
+    },
+    change_range(e) {
+      let priceInput = document.querySelectorAll(".pricer_input input");
+      let rangeInput = document.querySelectorAll(".range_input input");
+      let progress = document.querySelector(".slider .progress");
+      let pricegap = 100;
+      let minval = parseInt(priceInput[0].value),
+        maxval = parseInt(priceInput[1].value);
+      if (maxval - minval < pricegap || maxval > 1000) {
+        if (e.target.className === "ip_min") {
+          e.target.value = rangeInput[0].value;
+          minval = rangeInput[0].value;
+          progress.style.left = (minval / rangeInput[0].max) * 100 + "%";
+        } else {
+          e.target.value = rangeInput[1].value;
+          minval = rangeInput[1].value;
+          progress.style.right = 100 - (maxval / rangeInput[1].max) * 100 + "%";
+        }
+      } else {
+        if (e.target.className === "ip_min") {
+          rangeInput[0].value = minval;
+          progress.style.left = (minval / rangeInput[0].max) * 100 + "%";
+        } else {
+          rangeInput[1].value = maxval;
+          progress.style.right = 100 - (maxval / rangeInput[1].max) * 100 + "%";
+        }
+      }
+    },
+    list_sort_check() {
+      document.querySelector(".list_sort_all").classList.toggle("hidden");
+    },
+    list_sort_post(e) {
+      let $title_post = e.target.innerHTML;
+      let $title = document.querySelector(".list_sort_check_tittle").innerHTML;
+      document
+        .querySelector(".list_sort_post_tick")
+        .classList.remove("list_sort_post_tick");
+      e.target.classList.add("list_sort_post_tick");
+      if ($title_post !== $title) {
+        document.querySelector(".list_sort_check_tittle").innerHTML =
+          $title_post;
+      }
+      this.search();
+    },
+    change_category(e) {
+      if (e.target.classList.contains("c2_find_b1_item_check")) {
+        e.target.classList.remove("c2_find_b1_item_check");
+        document
+          .querySelector(".c2_find_b1_item_hidden")
+          .classList.add("c2_find_b1_item_check");
+      } else {
+        document
+          .querySelector(".c2_find_b1_item_check")
+          .classList.remove("c2_find_b1_item_check");
+        e.target.classList.add("c2_find_b1_item_check");
+      }
+      this.search();
+    },
+    change_size(e) {
+      if (e.target.classList.contains("b3_item_size_check")) {
+        e.target.classList.remove("b3_item_size_check");
+        document
+          .querySelector(".b3_item_size_hidden")
+          .classList.add("b3_item_size_check");
+      } else {
+        document
+          .querySelector(".b3_item_size_check")
+          .classList.remove("b3_item_size_check");
+        e.target.classList.add("b3_item_size_check");
+      }
+      this.search();
+    },
+    change_color(e) {
+      if (e.target.classList.contains("b3_item_color_check")) {
+        e.target.classList.remove("b3_item_color_check");
+        document
+          .querySelector(".b3_item_color_hidden")
+          .classList.add("b3_item_color_check");
+      } else {
+        document
+          .querySelector(".b3_item_color_check")
+          .classList.remove("b3_item_color_check");
+        e.target.classList.add("b3_item_color_check");
+      }
+      this.search();
+    },
+    change_filer(e) {
+      e.target.setAttribute("value", 1);
+      this.search();
+    },
+    search() {
+      this.loadderrr = false;
+      var category = document
+        .querySelector(".c2_find_b1_item_check")
+        .getAttribute("value");
+      var search_price = document
+        .querySelector(".filter_price")
+        .getAttribute("value");
+      var price_min = document.querySelector(".range_min").value;
+      var price_max = document.querySelector(".range_max").value;
+      var size = document
+        .querySelector(".b3_item_size_check")
+        .getAttribute("value");
+      var color = document
+        .querySelector(".b3_item_color_check")
+        .getAttribute("value");
+      var list_sort_post = document
+        .querySelector(".list_sort_post_tick")
+        .getAttribute("value");
+      this.$request({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/products/search",
+        data: {
+          color: color,
+          size: size,
+          category: category,
+          search_price: search_price,
+          price_min: price_min,
+          price_max: price_max,
+          list_sort_post: list_sort_post,
+        },
+      }).then((res) => {
+        this.products = res.data.data.data;
+        this.loadderrr = true;
       });
     },
   },
@@ -322,6 +585,7 @@ input[type="range"]::-webkit-range-thumb {
 .b2_find_b3 {
   margin-top: 55px;
 }
+
 .b3_box_color {
   display: flex;
   gap: 12px;
@@ -353,6 +617,11 @@ input[type="range"]::-webkit-range-thumb {
 }
 .b2_find_b4 {
   margin-top: 55px;
+}
+.div {
+  text-align: center;
+  background-color: white;
+  padding-top: 80px;
 }
 .b4_box_size {
   display: flex;
@@ -481,4 +750,8 @@ input[type="range"]::-webkit-range-thumb {
   height: 1.5px;
   background: #c97178;
 } */
+.b3_item_color_check {
+  width: 34px;
+  height: 34px;
+}
 </style>

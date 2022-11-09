@@ -125,6 +125,7 @@ export default {
         .get("http://127.0.0.1:8000/api/products/" + this.$route.params.id)
         .then((res) => {
           this.product = res.data.data;
+          console.log(res.data);
           this.imgs = res.data.imgs;
         });
     },

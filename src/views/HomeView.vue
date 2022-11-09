@@ -50,54 +50,32 @@
         products and choose the best choice for you
       </div>
       <div class="m_box2_nav">
-        <div class="m_box2_nav_item m_box2_nav_item_tick">WOMEN’S</div>
-        <div class="m_box2_nav_item">MENS</div>
-        <div class="m_box2_nav_item">UNISEX</div>
+        <div
+          class="m_box2_nav_item"
+          v-for="(item, index) in categories"
+          :key="index"
+          :class="{ m_box2_nav_item_tick: index == 0 }"
+          @click="category_tick($event)"
+          :value="item.id"
+        >
+          {{ item.name }}
+        </div>
       </div>
       <div class="m_box2_container">
-        <div class="m_box2_item">
+        <div
+          class="m_box2_item"
+          v-for="(item, index) in productCategory"
+          :key="index"
+        >
           <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
+            <img :src="'http://127.0.0.1:8000/' + item.img" />
             <div class="m_b2_it_type">HOT</div>
             <div class="m_b2_it_car">
               <img src="../assets/images/cart_item.png" />
             </div>
           </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box2_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box2_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box2_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
+          <div class="m_b2_it_title">{{ item.name }}</div>
+          <div class="m_b2_it_price">$ {{ item.price }}</div>
         </div>
       </div>
     </div>
@@ -113,93 +91,16 @@
         Maybe you will like it!
       </div>
       <div class="m_box4_container">
-        <div class="m_box4_item">
+        <div class="m_box4_item" v-for="(item, index) in products" :key="index">
           <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
+            <img :src="'http://127.0.0.1:8000/' + item.img" />
             <div class="m_b2_it_type">HOT</div>
             <div class="m_b2_it_car">
               <img src="../assets/images/cart_item.png" />
             </div>
           </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
-        </div>
-        <div class="m_box4_item">
-          <div class="m_b2_it_img">
-            <img src="../assets/images/img_sp.png" />
-            <div class="m_b2_it_type">HOT</div>
-            <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
-            </div>
-          </div>
-          <div class="m_b2_it_title">FLORAL FRILL T-SHIRT</div>
-          <div class="m_b2_it_price">$ 375.00</div>
+          <div class="m_b2_it_title">{{ item.name }}</div>
+          <div class="m_b2_it_price">$ {{ item.price }}</div>
         </div>
       </div>
     </div>
@@ -232,7 +133,67 @@
 </template>
 
 <script>
-export default {};
+export default {
+  name: "home",
+  data() {
+    return {
+      productCategory: [],
+      products: [],
+      categories: [],
+    };
+  },
+  created() {
+    this.ProductCategory();
+    this.getAllProducts();
+    this.getAllCategories();
+  },
+  methods: {
+    ProductCategory() {
+      this.$request({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/products/getNumProducts",
+        data: {
+          category_id: 0,
+        },
+      }).then((res) => {
+        this.productCategory = res.data.data;
+      });
+    },
+    getAllProducts() {
+      this.$request({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/products/getNumProducts",
+        data: {
+          category_id: -1,
+        },
+      }).then((res) => {
+        this.products = res.data.data;
+      });
+    },
+    getAllCategories() {
+      this.$request.get("http://127.0.0.1:8000/api/categories").then((res) => {
+        this.categories = res.data.data.data;
+      });
+    },
+    category_tick(e) {
+      let item = document.querySelector(".m_box2_nav_item_tick");
+      if (item.classList.contains("m_box2_nav_item_tick")) {
+        item.classList.remove("m_box2_nav_item_tick");
+        e.target.classList.add("m_box2_nav_item_tick");
+      }
+      let category_id = e.target.getAttribute("value");
+      this.$request({
+        method: "post",
+        url: "http://127.0.0.1:8000/api/products/getNumProducts",
+        data: {
+          category_id: category_id,
+        },
+      }).then((res) => {
+        this.productCategory = res.data.data;
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>
