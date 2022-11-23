@@ -64,28 +64,22 @@
 </template>
 
 <script>
+import Orders from "@/repository/orders";
 export default {
   name: "order",
   data() {
     return {
       isOrder: false,
-      token: this.$store.state.token,
       orders: [],
     };
   },
   created() {
+    this.$store.commit("chane_page_login", true);
     this.getAllOrders();
   },
   methods: {
     getAllOrders() {
-      this.$request({
-        method: "get",
-        url: "http://127.0.0.1:8000/api/orders",
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          token: this.token,
-        },
-      }).then((res) => {
+      Orders.get().then((res) => {
         if ((res.data.data.status = "success")) {
           this.isOrder = true;
           this.orders = res.data.data;

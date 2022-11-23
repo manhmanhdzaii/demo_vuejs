@@ -92,11 +92,15 @@
               v-for="(product, index) in products"
               :key="index"
             >
-              <img :src="'http://127.0.0.1:8000/' + product.img" alt="" />
+              <RouterLink :to="'/detail-product/' + product.id">
+                <img :src="'http://127.0.0.1:8000/' + product.img" alt="" />
+              </RouterLink>
               <div class="product_content">
-                <div class="product_name">
-                  {{ product.name }} x{{ product.qty }}
-                </div>
+                <RouterLink :to="'/detail-product/' + product.id">
+                  <div class="product_name">
+                    {{ product.name }} x{{ product.qty }}
+                  </div>
+                </RouterLink>
 
                 <div class="product_price">$ {{ product.price }}</div>
               </div>
@@ -146,6 +150,7 @@
 </template>
 
 <script>
+import CartSession from "@/repository/cartsession";
 export default {
   name: "checkout",
   data() {
@@ -171,6 +176,7 @@ export default {
     };
   },
   created() {
+    this.$store.commit("chane_page_login", true);
     this.getAllProducts();
   },
   computed: {
@@ -185,13 +191,14 @@ export default {
   },
   methods: {
     getAllProducts() {
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/cart_session",
-        data: {
-          cart: this.cart,
-        },
-      }).then((res) => {
+      if (this.cart.length == 0) {
+        alert("Không có sản phẩm nào trong giỏ hàng");
+        this.$router.push({ name: "home" });
+      }
+      let data = {
+        cart: this.cart,
+      };
+      CartSession.get(data).then((res) => {
         this.products = res.data;
       });
     },
@@ -224,18 +231,11 @@ export default {
     save() {
       if (this.validate()) {
         this.isPointer = true;
-        this.$request({
-          method: "post",
-          url: "http://127.0.0.1:8000/api/checkout",
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-            token: this.token,
-          },
-          data: {
-            data: this.data,
-            cart: this.cart,
-          },
-        }).then((res) => {
+        let data = {
+          data: this.data,
+          cart: this.cart,
+        };
+        CartSession.post(data).then((res) => {
           if (res.data.status == 200) {
             this.$store.commit("add_cart", []);
             this.isCheckout = true;

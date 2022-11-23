@@ -68,13 +68,21 @@
           :key="index"
         >
           <div class="m_b2_it_img">
-            <img :src="'http://127.0.0.1:8000/' + item.img" />
+            <RouterLink :to="'/detail-product/' + item.id">
+              <img :src="'http://127.0.0.1:8000/' + item.img" />
+            </RouterLink>
             <div class="m_b2_it_type">HOT</div>
             <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
+              <img
+                src="../assets/images/cart_item.png"
+                :value="item.id"
+                @click="saveCart($event)"
+              />
             </div>
           </div>
-          <div class="m_b2_it_title">{{ item.name }}</div>
+          <RouterLink :to="'/detail-product/' + item.id">
+            <div class="m_b2_it_title">{{ item.name }}</div>
+          </RouterLink>
           <div class="m_b2_it_price">$ {{ item.price }}</div>
         </div>
       </div>
@@ -93,13 +101,21 @@
       <div class="m_box4_container">
         <div class="m_box4_item" v-for="(item, index) in products" :key="index">
           <div class="m_b2_it_img">
-            <img :src="'http://127.0.0.1:8000/' + item.img" />
+            <RouterLink :to="'/detail-product/' + item.id">
+              <img :src="'http://127.0.0.1:8000/' + item.img" />
+            </RouterLink>
             <div class="m_b2_it_type">HOT</div>
             <div class="m_b2_it_car">
-              <img src="../assets/images/cart_item.png" />
+              <img
+                src="../assets/images/cart_item.png"
+                :value="item.id"
+                @click="saveCart($event)"
+              />
             </div>
           </div>
-          <div class="m_b2_it_title">{{ item.name }}</div>
+          <RouterLink :to="'/detail-product/' + item.id">
+            <div class="m_b2_it_title">{{ item.name }}</div>
+          </RouterLink>
           <div class="m_b2_it_price">$ {{ item.price }}</div>
         </div>
       </div>
@@ -133,6 +149,8 @@
 </template>
 
 <script>
+import Categories from "@/repository/categories";
+import Products from "@/repository/products";
 export default {
   name: "home",
   data() {
@@ -143,35 +161,30 @@ export default {
     };
   },
   created() {
+    this.$store.commit("chane_page_login", true);
     this.ProductCategory();
     this.getAllProducts();
     this.getAllCategories();
   },
   methods: {
     ProductCategory() {
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/products/getNumProducts",
-        data: {
-          category_id: 0,
-        },
-      }).then((res) => {
+      let data = {
+        category_id: 0,
+      };
+      Products.getNumProducts(data).then((res) => {
         this.productCategory = res.data.data;
       });
     },
     getAllProducts() {
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/products/getNumProducts",
-        data: {
-          category_id: -1,
-        },
-      }).then((res) => {
+      let data = {
+        category_id: -1,
+      };
+      Products.getNumProducts(data).then((res) => {
         this.products = res.data.data;
       });
     },
     getAllCategories() {
-      this.$request.get("http://127.0.0.1:8000/api/categories").then((res) => {
+      Categories.get().then((res) => {
         this.categories = res.data.data.data;
       });
     },
@@ -182,15 +195,32 @@ export default {
         e.target.classList.add("m_box2_nav_item_tick");
       }
       let category_id = e.target.getAttribute("value");
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/products/getNumProducts",
-        data: {
-          category_id: category_id,
-        },
-      }).then((res) => {
+      let data = {
+        category_id: category_id,
+      };
+      Products.getNumProducts(data).then((res) => {
         this.productCategory = res.data.data;
       });
+    },
+    saveCart(e) {
+      let cartSession = this.$store.state.cart;
+      let id = e.target.getAttribute("value");
+      let idx = cartSession.findIndex((element) => {
+        return element.productId === id;
+      });
+      console.log(cartSession);
+
+      if (idx !== -1) {
+        cartSession[idx]["qty"] = cartSession[idx]["qty"] + 1;
+      } else {
+        let cart = {
+          productId: id,
+          qty: 1,
+        };
+        cartSession.push(cart);
+      }
+      this.$store.commit("add_cart", cartSession);
+      alert("Thêm sản phẩm vào giỏ hàng thành công");
     },
   },
 };
@@ -412,6 +442,7 @@ export default {
 }
 .m_b2_it_car img {
   width: 20px;
+  cursor: pointer;
   height: 20px;
 }
 .m_b2_it_title {

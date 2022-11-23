@@ -4,9 +4,28 @@ import ListProductView from '../views/ListProductsView.vue'
 import DetailProductView from '../views/DetailProductView.vue'
 import CartView from '../views/CartView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
-import LoginView from '../views/LoginView.vue'
 import OrderView from '../views/OrderView.vue'
 
+import LoginView from '../views/auth/LoginView.vue'
+import RegisterView from '../views/auth/RegisterView.vue'
+import ForGotView from '@/views/password/ForGotView.vue'
+import ResetView from '@/views/password/ResetView.vue'
+function is_Login(to, from, next){
+  var token = localStorage.getItem('token');
+  if(token){
+    next();
+  }else{
+    next({name: 'login'});
+  }
+}
+function is_outside(to, from, next){
+  var token = localStorage.getItem('token');
+  if(!token){
+    next();
+  }else{
+    next({name: 'home'});
+  }
+}
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -33,17 +52,40 @@ const router = createRouter({
     {
       path: '/checkout',
       name: 'checkout',
+      beforeEnter: [is_Login],
       component: CheckoutView
     },
     {
       path: '/login',
       name: 'login',
+      beforeEnter: [is_outside],
       component: LoginView
+    },
+    {
+      path: '/register',
+      name: 'register',
+      beforeEnter: [is_outside],
+      component: RegisterView
     },
     {
       path: '/orders',
       name: 'orders',
       component: OrderView
+    },
+    {
+      path: '/password',
+      name: 'password',
+      beforeEnter: [is_outside],
+      children: [
+        {
+          path: 'forgot',
+          component: ForGotView,
+        },
+        {
+          path: 'reset-password/:token',
+          component: ResetView,
+        },
+      ],
     },
   ]
 })

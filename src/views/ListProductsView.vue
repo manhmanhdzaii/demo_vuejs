@@ -2,7 +2,7 @@
   <div class="main">
     <div class="main_title">
       <div class="main_link_title">
-        <a href="#">Home</a>/<a href="#">Shop</a>{{ token }}
+        <a href="/">Home</a>/<a href="#">Shop</a>
       </div>
     </div>
     <div class="main_container">
@@ -221,7 +221,11 @@
                 </RouterLink>
                 <div class="m_b2_it_type">HOT</div>
                 <div class="m_b2_it_car">
-                  <img src="../assets/images/cart_item.png" />
+                  <img
+                    src="../assets/images/cart_item.png"
+                    :value="product.id"
+                    @click="saveCart($event)"
+                  />
                 </div>
               </div>
               <RouterLink :to="'/detail-product/' + product.id">
@@ -229,6 +233,13 @@
               </RouterLink>
               <div class="m_b2_it_price">{{ product.price }} $</div>
             </div>
+            <pagination
+              :totalPages="pagination.totalPages"
+              :total="pagination.total"
+              :perPage="pagination.perPage"
+              :current-page="pagination.currentPage"
+              @pagechanged="onPageChange"
+            />
           </div>
           <div class="div" v-else>
             <img src="../assets/images/Loading_icon.gif" alt="" />
@@ -240,33 +251,50 @@
 </template>
 
 <script>
+import cpnPagination from "@/components/includes/Pagination.vue";
+import Categories from "@/repository/categories";
+import Products from "@/repository/products";
 export default {
   name: "listProduct",
   data() {
     return {
       categories: [],
       products: [],
-      cart: this.$store.state.cart.length,
-      token: this.$store.state.token,
       loadderrr: true,
+      pagination: {
+        currentPage: "",
+        totalPages: "",
+        total: "",
+        perPage: "",
+      },
     };
   },
   created() {
+    this.$store.commit("chane_page_login", true);
     this.getAllCategories();
     this.getAllProducts();
+  },
+  components: {
+    pagination: cpnPagination,
   },
   methods: {
     price_search() {
       this.listSort = !this.listSort;
     },
     getAllCategories() {
-      this.$request.get("http://127.0.0.1:8000/api/categories").then((res) => {
+      Categories.get().then((res) => {
         this.categories = res.data.data.data;
       });
     },
     getAllProducts() {
-      this.$request.get("http://127.0.0.1:8000/api/products").then((res) => {
+      this.loadderrr = false;
+      Products.get().then((res) => {
+        this.loadderrr = true;
         this.products = res.data.data.data;
+        this.pagination.currentPage = res.data.data.current_page;
+        this.pagination.totalPages = res.data.data.last_page;
+        this.pagination.total = res.data.data.total;
+        this.pagination.perPage = res.data.data.per_page;
       });
     },
     change_price(e) {
@@ -384,39 +412,76 @@ export default {
     },
     search() {
       this.loadderrr = false;
-      var category = document
+      let category = document
         .querySelector(".c2_find_b1_item_check")
         .getAttribute("value");
-      var search_price = document
+      let search_price = document
         .querySelector(".filter_price")
         .getAttribute("value");
-      var price_min = document.querySelector(".range_min").value;
-      var price_max = document.querySelector(".range_max").value;
-      var size = document
+      let price_min = document.querySelector(".range_min").value;
+      let price_max = document.querySelector(".range_max").value;
+      let size = document
         .querySelector(".b3_item_size_check")
         .getAttribute("value");
-      var color = document
+      let color = document
         .querySelector(".b3_item_color_check")
         .getAttribute("value");
-      var list_sort_post = document
+      let list_sort_post = document
         .querySelector(".list_sort_post_tick")
         .getAttribute("value");
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/products/search",
-        data: {
-          color: color,
-          size: size,
-          category: category,
-          search_price: search_price,
-          price_min: price_min,
-          price_max: price_max,
-          list_sort_post: list_sort_post,
-        },
-      }).then((res) => {
+
+      let data = {
+        color: color,
+        size: size,
+        category: category,
+        search_price: search_price,
+        price_min: price_min,
+        price_max: price_max,
+        list_sort_post: list_sort_post,
+      };
+      Products.search(data).then((res) => {
         this.products = res.data.data.data;
         this.loadderrr = true;
+        this.pagination.currentPage = res.data.data.current_page;
+        this.pagination.totalPages = res.data.data.last_page;
+        this.pagination.total = res.data.data.total;
+        this.pagination.perPage = res.data.data.per_page;
       });
+    },
+    onPageChange(page) {
+      this.loadderrr = false;
+      this.pagination.currentPage = page;
+      Products.page(page).then((res) => {
+        console.log(res);
+        if (res.data.status == "success") {
+          this.loadderrr = true;
+          this.products = res.data.data.data;
+          this.pagination.currentPage = res.data.data.current_page;
+          this.pagination.totalPages = res.data.data.last_page;
+          this.pagination.total = res.data.data.total;
+          this.pagination.perPage = res.data.data.per_page;
+        }
+      });
+    },
+    saveCart(e) {
+      let cartSession = this.$store.state.cart;
+      let id = e.target.getAttribute("value");
+      let idx = cartSession.findIndex((element) => {
+        return element.productId === id;
+      });
+      console.log(cartSession);
+
+      if (idx !== -1) {
+        cartSession[idx]["qty"] = cartSession[idx]["qty"] + 1;
+      } else {
+        let cart = {
+          productId: id,
+          qty: 1,
+        };
+        cartSession.push(cart);
+      }
+      this.$store.commit("add_cart", cartSession);
+      alert("Thêm sản phẩm vào giỏ hàng thành công");
     },
   },
 };
@@ -719,6 +784,7 @@ input[type="range"]::-webkit-range-thumb {
 }
 .m_b2_it_car img {
   width: 20px;
+  cursor: pointer;
   height: 20px;
 }
 .m_b2_it_title {

@@ -1,4 +1,8 @@
 <template>
+  <div class="header_login">
+    <RouterLink to="/">Trang chủ</RouterLink>
+    <RouterLink to="/login">Đăng nhập</RouterLink>
+  </div>
   <form
     action=""
     method="post"
@@ -7,18 +11,17 @@
     @submit.prevent="save()"
   >
     <div class="d_flex">
-      <p class="min_w_100">Tên đăng nhập</p>
+      <p class="min_w_100">Email</p>
       <div class="div">
         <input
           type="text"
-          placeholder="Nhập tên đăng nhập"
+          placeholder="Nhập email.."
           class="box_input"
           name="user_name"
           v-model="data.email"
-          @blur="validate()"
         />
         <p class="err">
-          {{ errors.email }}
+          <span v-if="err.email">{{ err.email[0] }}</span>
         </p>
       </div>
     </div>
@@ -27,14 +30,30 @@
       <div class="div">
         <input
           type="password"
-          placeholder="Nhập mật khẩu"
+          placeholder="Nhập mật khẩu.."
           class="box_input"
           name="password"
           v-model="data.password"
-          @blur="validate()"
         />
         <p class="err">
-          {{ errors.password }}
+          <span v-if="err.password">{{ err.password[0] }}</span>
+        </p>
+      </div>
+    </div>
+    <div class="d_flex">
+      <p class="min_w_100">Mật khẩu</p>
+      <div class="div">
+        <input
+          type="password"
+          placeholder="Nhập lại mật khẩu..."
+          class="box_input"
+          name="re_password"
+          v-model="data.password_confirmation"
+        />
+        <p class="err">
+          <span v-if="err.password_confirmation">{{
+            err.password_confirmation[0]
+          }}</span>
         </p>
       </div>
     </div>
@@ -50,59 +69,48 @@
 </template>
 
 <script>
+import ResetPass from "@/repository/password/reset";
 export default {
-  name: "login",
+  name: "resetpass",
   data() {
     return {
       data: {
         email: "",
         password: "",
+        password_confirmation: "",
       },
-      errors: {
-        email: "",
-        password: "",
-      },
+      err: [],
       isPointer: false,
     };
   },
+  created() {
+    this.data.email = this.$route.query.email;
+  },
   methods: {
     save() {
-      if (this.validate()) {
-        this.isPointer = true;
-        this.$request({
-          method: "post",
-          url: "http://127.0.0.1:8000/api/login",
-          data: {
-            email: this.data.email,
-            password: this.data.password,
-          },
-        }).then((res) => {
-          if (res.data.status == 200) {
-            this.$store.commit("add_token", res.data.token);
-            this.$store.commit("add_name", res.data.name);
-            this.$router.push({ name: "list-products" });
+      this.isPointer = true;
+      var data = {
+        email: this.data.email,
+        password: this.data.password,
+        password_confirmation: this.data.password_confirmation,
+        token: this.$route.params.token,
+      };
+      ResetPass.post(data).then(
+        (res) => {
+          console.log(res);
+          alert(res.data.content);
+          if (res.data.status == "success") {
+            this.$router.push("/login");
           } else {
             this.isPointer = false;
-            this.errors.email = "Tài khoản hoặc mật khẩu chưa chính xác";
           }
-        });
-      }
-    },
-    validate() {
-      let isValid = true;
-      this.errors = {
-        email: "",
-        password: "",
-      };
-      if (!this.data.email) {
-        this.errors.email = "Tài khoản không dc để trống";
-        isValid = false;
-      }
-      if (!this.data.password) {
-        this.errors.password = "Mật khẩu không dc để trống";
-        isValid = false;
-      }
-      return isValid;
+        },
+        (err) => {
+          this.isPointer = false;
+          this.err = err.response.data.errors;
+          console.log(err.response.data.errors);
+        }
+      );
     },
   },
 };
@@ -119,7 +127,7 @@ export default {
 .login_form {
   width: max-content;
   display: block;
-  margin: 100px auto;
+  margin: 50px auto;
 }
 .d_flex {
   display: flex;
@@ -147,6 +155,17 @@ export default {
   background: blue;
   color: white;
   border: none;
+}
+.header_login {
+  width: 600px;
+  margin: 50px auto;
+  display: flex;
+  justify-content: space-between;
+}
+.header_login a {
+  color: blue;
+  text-decoration: revert;
+  font-family: auto;
 }
 .success {
   width: 100%;

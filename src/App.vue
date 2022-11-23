@@ -8,9 +8,10 @@ import { RouterLink, RouterView } from "vue-router";
   <cpnHeader
     :count="this.$store.state.cart.length"
     :name="this.$store.state.name"
+    v-if="this.$store.state.page_login"
   />
   <RouterView />
-  <cpnFooter />
+  <cpnFooter v-if="this.$store.state.page_login" />
 </template>
 
 <style scoped>

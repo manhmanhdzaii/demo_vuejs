@@ -9,6 +9,12 @@
     <div class="main_container">
       <div class="main_img">
         <div class="main_img_demo">
+          <div class="item_img_demo item_img_demo_tick">
+            <img
+              :src="'http://127.0.0.1:8000/' + product.img"
+              @click="change_img($event)"
+            />
+          </div>
           <div class="item_img_demo" v-for="(img, index) in imgs" :key="index">
             <img
               :src="'http://127.0.0.1:8000/' + img.path"
@@ -104,6 +110,7 @@
 </template>
 
 <script>
+import Products from "@/repository/products";
 export default {
   name: "detailProduct",
   data() {
@@ -111,23 +118,21 @@ export default {
       product: "",
       add_cart_value: 1,
       imgs: [],
-      cart: [],
     };
   },
   computed: {},
   created() {
+    this.$store.commit("chane_page_login", true);
     this.getProduct();
-    this.get_cart();
   },
   methods: {
     getProduct() {
-      this.$request
-        .get("http://127.0.0.1:8000/api/products/" + this.$route.params.id)
-        .then((res) => {
-          this.product = res.data.data;
-          console.log(res.data);
-          this.imgs = res.data.imgs;
-        });
+      let id = this.$route.params.id;
+      Products.getById(id).then((res) => {
+        this.product = res.data.data;
+        console.log(res.data);
+        this.imgs = res.data.imgs;
+      });
     },
     add_cart_summation() {
       if (this.add_cart_value <= 0 || this.add_cart_value == "") {
@@ -148,14 +153,15 @@ export default {
       this.add_cart_value = Number(e.target.value);
     },
     change_img(e) {
+      let ele = document.querySelector(".item_img_demo_tick");
+      ele.classList.remove("item_img_demo_tick");
       document.getElementById("img_show").setAttribute("src", e.target.src);
-    },
-    get_cart() {
-      this.cart = this.$store.state.cart;
+      e.target.parentElement.classList.add("item_img_demo_tick");
     },
     add_cart() {
+      let cartSession = this.$store.state.cart;
       let id = this.$route.params.id;
-      let idx = this.cart.findIndex((element) => {
+      let idx = cartSession.findIndex((element) => {
         return element.productId === id;
       });
       let cart = {
@@ -163,11 +169,13 @@ export default {
         qty: this.add_cart_value,
       };
       if (idx !== -1) {
-        this.cart[idx] = cart;
+        cartSession[idx] = cart;
       } else {
-        this.cart.push(cart);
+        cartSession.push(cart);
       }
-      this.$store.commit("add_cart", this.cart);
+      alert("Thêm sản phẩm vào giỏ hàng thành công");
+      this.$store.commit("add_cart", cartSession);
+      this.$router.push("/cart");
     },
   },
 };
@@ -195,8 +203,7 @@ export default {
 }
 .item_img_demo {
   width: 79px;
-  height: 80px;
-  margin-bottom: 25px;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 .main_img_show {
@@ -303,5 +310,8 @@ export default {
 .ct_des_item p {
   font-family: "DM Sans";
   color: #55595b;
+}
+.item_img_demo_tick {
+  border: 1px solid rgb(226, 89, 89);
 }
 </style>

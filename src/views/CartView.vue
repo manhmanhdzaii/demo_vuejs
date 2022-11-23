@@ -2,14 +2,14 @@
   <div class="main">
     <div class="main_title">
       <div class="main_link_title">
-        <a href="#">Home</a>/<a href="#">Cart</a>
+        <a href="/">Home</a>/<a href="#">Cart</a>
       </div>
     </div>
     <div class="main_container">
       <div class="container_box1">
         <img src="../assets/images/imgcart.png" alt="" />
       </div>
-      <div class="container_box2">
+      <div class="container_box2" v-if="this.$store.state.cart != ''">
         <div class="table_cart">
           <table>
             <tr>
@@ -20,24 +20,32 @@
             </tr>
             <tr v-for="(product, index) in products" :key="index">
               <td>
-                <div class="img_delete">
+                <div class="img_delete" @click="deltete_item(index)">
                   <img src="../assets/images/delete_cart.png" alt="" />
                 </div>
               </td>
               <td class="product">
-                <img :src="'http://127.0.0.1:8000/' + product.img" alt="" />
+                <RouterLink :to="'/detail-product/' + product.id">
+                  <img :src="'http://127.0.0.1:8000/' + product.img" alt="" />
+                </RouterLink>
                 <div class="detail_product">
-                  <p class="name_product">{{ product.name }}</p>
+                  <RouterLink :to="'/detail-product/' + product.id">
+                    <p class="name_product">{{ product.name }}</p>
+                  </RouterLink>
                   <p class="price_product">$ {{ product.price }}</p>
                 </div>
               </td>
               <td>
                 <div class="amount_product">
-                  <div class="count_minus">-</div>
-                  <input type="number" :value="product.qty" />
-                  <input type="hidden" :value="total" />
-
-                  <div class="count_add">+</div>
+                  <div class="count_minus" @click="count_minus($event)">-</div>
+                  <input
+                    type="number"
+                    :value="product.qty"
+                    class="cart_product"
+                    :product_id="product.id"
+                    :name="'cart_product[' + product.id + ']'"
+                  />
+                  <div class="count_add" @click="count_add($event)">+</div>
                 </div>
               </td>
               <td class="price_total_product">
@@ -57,26 +65,32 @@
           </table>
         </div>
         <div class="handle">
-          <button class="button_update">UPDATE CART</button>
+          <button class="button_update" @click="updateCart()">
+            UPDATE CART
+          </button>
           <RouterLink to="/checkout">
             <button class="button_checkout">PROCESS TO CHECK OUT</button>
           </RouterLink>
         </div>
+      </div>
+      <div class="container_box2" v-else>
+        <div class="null_cart">Không có sản phẩm nào trong giỏ hàng !</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import CartSession from "@/repository/cartsession";
 export default {
   name: "cart",
   data() {
     return {
       products: [],
-      cart: this.$store.state.cart,
     };
   },
   created() {
+    this.$store.commit("chane_page_login", true);
     this.getAllProducts();
   },
   computed: {
@@ -91,15 +105,54 @@ export default {
   },
   methods: {
     getAllProducts() {
-      this.$request({
-        method: "post",
-        url: "http://127.0.0.1:8000/api/cart_session",
-        data: {
-          cart: this.cart,
-        },
-      }).then((res) => {
-        this.products = res.data;
+      let cartSession = this.$store.state.cart;
+      let data = {
+        cart: cartSession,
+      };
+      CartSession.get(data).then((res) => {
+        if (res.data != "no-data") {
+          this.products = res.data;
+        }
       });
+    },
+    updateCart() {
+      let arrays = document.querySelectorAll(".cart_product");
+      let arr = [...arrays].map(function (val) {
+        return {
+          productId: val.getAttribute("product_id"),
+          qty: val.value,
+        };
+      });
+      this.$store.commit("add_cart", arr);
+      alert("Cập nhật giỏ hàng thành công");
+      this.getAllProducts();
+    },
+    count_minus(e) {
+      let val = e.target.nextSibling.value;
+      if (val == "" || val <= 1) {
+        e.target.nextSibling.value = 1;
+      } else {
+        e.target.nextSibling.value = Number(val) - 1;
+      }
+    },
+    count_add(e) {
+      let val = e.target.previousSibling.value;
+      if (val == "" || val < 0) {
+        e.target.previousSibling.value = 1;
+      } else {
+        e.target.previousSibling.value = Number(val) + 1;
+      }
+    },
+    deltete_item(idx) {
+      let result = confirm("Xóa sản phẩm này khỏi giỏ hàng ?");
+      if (result) {
+        let alltr = document.getElementsByTagName("tr");
+        Array.from(alltr).forEach(function (value, index) {
+          if (idx == index - 1) {
+            value.remove();
+          }
+        });
+      }
     },
   },
 };
@@ -260,5 +313,12 @@ table tr td:nth-child(4) {
   color: #ffffff;
   border: unset;
   background: #2b2f32;
+}
+.null_cart {
+  padding: 50px 0px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 </style>

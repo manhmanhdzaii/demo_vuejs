@@ -10,8 +10,8 @@ const store = createStore({
       return {
         cart: [
         ],
-        token:"",
-        name:"",
+        name: localStorage.getItem("name"),
+        page_login: true,
       }
     },
     getters: {
@@ -20,11 +20,11 @@ const store = createStore({
         add_cart(state, arr){
             state.cart = arr;
         },
-        add_token(state, token){
-            state.token = token;
-        },
         add_name(state, name){
             state.name = name;
+        },
+        chane_page_login(state, value){
+            state.page_login = value;
         }
     }
 

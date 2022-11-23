@@ -8,9 +8,19 @@
         <div class="ct_phone_content">Hotline: (01) 23 456 789</div>
       </div>
       <div class="h_contact_title">
-        <div v-if="name != ''">Xin chào, {{ name }}</div>
+        <div v-if="checkName">
+          <div class="h_name_user">
+            Xin chào, {{ name }}
+            <ul class="sub_name_user hidden">
+              <li><RouterLink to="/cart">Thông tin giỏ hàng</RouterLink></li>
+              <li><RouterLink to="/orders">Danh sách đơn hàng</RouterLink></li>
+              <li @click="logout()">Đăng xuất</li>
+            </ul>
+          </div>
+        </div>
         <div class="h_login" v-else>
-          <a class="link-login" href="/login">Đăng nhập</a>
+          <RouterLink class="link-login" to="/login">Đăng nhập</RouterLink>
+          <RouterLink class="link-login" to="/login">Đăng ký</RouterLink>
         </div>
       </div>
     </div>
@@ -126,7 +136,34 @@
 <script>
 export default {
   name: "header",
-  props: ["count", "name"],
+  props: {
+    count: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    name: {
+      type: String,
+      required: false,
+      default: "",
+    },
+  },
+  computed: {
+    checkName() {
+      if (this.name) {
+        return true;
+      }
+      return false;
+    },
+  },
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$store.commit("add_name", "");
+      this.$store.commit("chane_page_login", false);
+      this.$router.push({ name: "login" });
+    },
+  },
 };
 </script>
 
@@ -276,6 +313,48 @@ a.link-login {
   padding: 30px 28px 36px 24px;
   margin-top: 70px;
   height: max-content;
+}
+.h_name_user {
+  font-family: auto;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  cursor: pointer;
+}
+.h_name_user:hover .sub_name_user {
+  display: block !important;
+}
+.h_name_user::after {
+  position: absolute;
+  top: 100%;
+  content: " ";
+  width: 100%;
+  height: 10px;
+}
+.sub_name_user {
+  position: absolute;
+  background: #d2b0b6;
+  top: 120%;
+  z-index: 1;
+  padding: 4px 0px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.sub_name_user li {
+  cursor: pointer;
+  padding: 5px 25px 5px 12px;
+  font-family: auto;
+  color: #4b7090;
+}
+.sub_name_user li a {
+  font-family: auto;
+  color: #4b7090;
+}
+.sub_name_user li:hover {
+  background-color: white;
+  color: black;
 }
 .header_sub_arrow {
   margin-bottom: 25px;
